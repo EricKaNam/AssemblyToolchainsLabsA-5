@@ -1,8 +1,9 @@
 #! /bin/bash
 
 # Created by Lubos Kuzma
+# Revised by Ching Hang Chung, Eric
 # ISS Program, SADT, SAIT
-# August 2022
+# October 2023
 
 
 if [ $# -lt 1 ]; then
@@ -15,7 +16,7 @@ if [ $# -lt 1 ]; then
 	echo "-b | --break <break point>    Add breakpoint after running gdb. Default is _start."
 	echo "-r | --run                    Run program in gdb automatically. Same as run command inside gdb env."
 	echo "-q | --qemu                   Run executable in QEMU emulator. This will execute the program."
-	echo "-64| --x86-64                 Compile for 64bit (x86-64) system."
+	echo "-32| --x64                 	Compile for 32bit (x64) system."
 	echo "-o | --output <filename>      Output filename."
 
 	exit 1
@@ -25,7 +26,7 @@ POSITIONAL_ARGS=()
 GDB=False
 OUTPUT_FILE=""
 VERBOSE=False
-BITS=False
+BITS=True
 QEMU=False
 BREAK="_start"
 RUN=False
@@ -44,8 +45,8 @@ while [[ $# -gt 0 ]]; do
 			VERBOSE=True
 			shift # past argument
 			;;
-		-64|--x84-64)
-			BITS=True
+		-32|--x64)
+			BITS=False
 			shift # past argument
 			;;
 		-q|--qemu)
@@ -95,31 +96,29 @@ if [ "$VERBOSE" == "True" ]; then
 	echo "	64 bit mode = $BITS" 
 	echo ""
 
-	echo "NASM started..."
+	echo "GCC started..."
 
 fi
 
+# Assemble and link with gcc
+# gcc -o "$OUTPUT_FILE" "$1"
+
 if [ "$BITS" == "True" ]; then
 
+	#gcc -E $1 -o $OUTPUT_FILE.o && echo ""
 	nasm -f elf64 $1 -o $OUTPUT_FILE.o && echo ""
 
 
 elif [ "$BITS" == "False" ]; then
 
+	#gcc -m32 -E $1 -o $OUTPUT_FILE.o && echo ""
 	nasm -f elf $1 -o $OUTPUT_FILE.o && echo ""
 
 fi
 
 if [ "$VERBOSE" == "True" ]; then
 
-	echo "NASM finished"
-	echo "Linking ..."
-	
-fi
-
-if [ "$VERBOSE" == "True" ]; then
-
-	echo "NASM finished"
+	echo "GCC finished"
 	echo "Linking ..."
 fi
 
